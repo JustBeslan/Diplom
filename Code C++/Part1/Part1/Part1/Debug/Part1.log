@@ -1,0 +1,6 @@
+﻿  Part1.cpp
+C:\Users\Ibrag\Desktop\Diplom\Part1\Part1\Part1\Part1.cpp(232,7): warning C4215: нестандартное расширение: long float
+C:\Users\Ibrag\Desktop\Diplom\Part1\Part1\Part1\Part1.cpp(234,7): warning C4215: нестандартное расширение: long float
+C:\Users\Ibrag\Desktop\Diplom\Part1\Part1\Part1\Part1.cpp(260,19): warning C4305: инициализация: усечение из "double" в "float"
+C:\Users\Ibrag\Desktop\Diplom\Part1\Part1\Part1\Part1.cpp(261,19): warning C4305: инициализация: усечение из "double" в "float"
+  Part1.vcxproj -> C:\Users\Ibrag\Desktop\Diplom\Part1\Part1\Debug\Part1.exe

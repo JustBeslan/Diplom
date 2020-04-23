@@ -6,36 +6,40 @@ import moviepy.editor as mp
 from scipy.signal import butter, lfilter
 # from RESULT.training_gender import GenderClassificatory
 from RESULT.training_human import HumanClassificatory
+from tkinter import END
 
 
 class Audio_Processing:
     SR = 16000
-    slice_ms = 500
+    slice_ms = 100
     area = 3
 
-    def __init__(self, path_video, name_video, label):
-        print(path_video + name_video)
-        self.label = label
+    def __init__(self, path_video, name_video, messages):
+        self.messages = messages
         self.nameVideo = name_video
         self.pathVideo = path_video
         self.to_extract_audio_from_video()
         self.filtering_audio()
         self.filteredPartsData = self.ExtractVoices(self.filtered_data_audio, self.SR)
+        librosa.output.write_wav(self.path_audio + "voices.wav", self.filteredPartsData.flatten(), self.SR)
 
     def to_extract_audio_from_video(self):
-        self.label["text"] = "Извлекается аудио из видео..."
+        self.messages.insert(END, "Извлекается аудио из видео...\n")
         # files = os.listdir(self.pathVideo)
         # video_file_clip = mp.VideoFileClip(self.pathVideo + files[0])
         video_file_clip = mp.VideoFileClip(self.pathVideo + self.nameVideo)
         audio_clip = video_file_clip.audio
         path_audio = self.pathVideo + "Audio/"
-        os.makedirs(path_audio)
-        name_original_audio = "Audio" + self.nameVideo
+        if not os.path.exists(path_audio):
+            os.makedirs(path_audio)
+        name_original_audio = "Audio" + str(self.nameVideo).split(".")[0] + ".wav"
         audio_clip.write_audiofile(path_audio + name_original_audio, ffmpeg_params=["-ac", "1"])
         self.path_audio = path_audio
         self.name_original_audio = name_original_audio
+        self.messages.insert(END, "Извлечение завершено\n")
 
     def filtering_audio(self):
+        self.messages.insert(END, "Идет фильтрация извлеченного аудио...\n")
         data_audio, sr = librosa.load(self.path_audio + self.name_original_audio, sr=self.SR)  # mono=False
         step = int((sr / 1000) * self.slice_ms)  # Always value parameter slice_ms should be >= 10
         count_step = math.ceil(len(data_audio) / step)  # This is so time video(step = fs_rate).
@@ -54,10 +58,12 @@ class Audio_Processing:
             part_data_audio = data_audio[from_part_audio:to_part_audio]
             filtered_part_data_audio = lfilter(b, a, part_data_audio)
             self.filtered_data_audio[from_part_audio:to_part_audio] = filtered_part_data_audio
-        self.nameFilteredAudio = self.path_audio + "Filtered_" + self.name_original_audio
-        librosa.output.write_wav(self.nameFilteredAudio, self.filtered_data_audio, sr=self.SR)
+        self.nameFilteredAudio = "Filtered_" + self.name_original_audio
+        librosa.output.write_wav(self.path_audio + self.nameFilteredAudio, self.filtered_data_audio, sr=self.SR)
+        self.messages.insert(END, "Фильтрация аудио завершена\n")
 
     def ExtractVoices(self, data, sr):
+        self.messages.insert(END, "Идет удаление тишины...\n")
         stepWindow = int((sr / 1000) * 200)
         partData = data[0:stepWindow]
         mu = np.sum(partData) / stepWindow
@@ -66,13 +72,14 @@ class Audio_Processing:
         partsAudio = self.split_audio(data, sr, self.slice_ms, self.slice_ms)
         needParts = []
         for part in partsAudio:
-            length = len([elem for elem in part if (np.absolute(elem - mu) / sigma) > 3])
+            length = len([elem for elem in part if (np.absolute(elem - mu) / sigma) > 4])
             if length >= len(part) // 2:
                 needParts.append(part)
+        self.messages.insert(END, "Интервалы голоса образованы\n")
         return np.array(needParts)
 
     def split_audio(self, data, sr, window_ms, margin_ms):
-        print("SplitAudio...")
+        self.messages.insert(END, "Идет дробление аудио...\n")
         partsAudio = []
         stepWindow = int((sr / 1000) * window_ms)
         stepMargin = int((sr / 1000) * margin_ms)
@@ -80,6 +87,7 @@ class Audio_Processing:
             partAudio = np.array(data[i:i + stepWindow])
             if len(partAudio) == stepWindow:
                 partsAudio.append(partAudio)
+        self.messages.insert(END, "Образовались отдельные части аудио\n")
         return partsAudio
 
     def get_statistics(self, L):
@@ -92,6 +100,7 @@ class Audio_Processing:
         return dictionary
 
     def extract_not_presenter(self, parts_audio):
+        self.messages.insert(END, "Идет выделение голосов посторонних ведущему...\n")
         # parts_audio = self.split_audio(filtered_data_audio, self.SR, self.slice_ms, self.slice_ms)
         # gender_classificatory = GenderClassificatory(self.pathAudio)
         human_classificatory = HumanClassificatory(self.path_audio)
@@ -103,7 +112,7 @@ class Audio_Processing:
                 first_classification.append("presenter")
             else:
                 first_classification.append("not_presenter")
-
+        print(first_classification)
         for i in range(len(first_classification)):
             left = first_classification[i - self.area: i]
             right = first_classification[i: i + self.area]
@@ -132,5 +141,7 @@ class Audio_Processing:
                 intervals.append(interval)
                 interval = []
                 new_interval = True
+        self.messages.insert(END, "Интервалы времени выделены...\n")
+        print(intervals)
         return intervals
 

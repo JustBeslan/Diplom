@@ -4,43 +4,43 @@ import librosa
 import numpy as np
 import moviepy.editor as mp
 from scipy.signal import butter, lfilter
-# from RESULT.training_gender import GenderClassificatory
-from RESULT.training_human import HumanClassificatory
 from tkinter import END
+from RESULT.OtherProcessing import split_audio
 
 
 class Audio_Processing:
     SR = 16000
-    slice_ms = 100
-    area = 3
+    slice_ms = 25
+    intervals_silence = []
+    intervals_voices = []
 
     def __init__(self, path_video, name_video, messages):
         self.messages = messages
         self.nameVideo = name_video
         self.pathVideo = path_video
+
         self.to_extract_audio_from_video()
-        self.filtering_audio()
-        self.filteredPartsData = self.ExtractVoices(self.filtered_data_audio, self.SR)
-        librosa.output.write_wav(self.path_audio + "voices.wav", self.filteredPartsData.flatten(), self.SR)
+        self.messages.insert(END, "Видео загружено\n")
+        self.messages.insert(END, 'Нажмите "Далее"\n')
 
     def to_extract_audio_from_video(self):
         self.messages.insert(END, "Извлекается аудио из видео...\n")
-        # files = os.listdir(self.pathVideo)
-        # video_file_clip = mp.VideoFileClip(self.pathVideo + files[0])
-        video_file_clip = mp.VideoFileClip(self.pathVideo + self.nameVideo)
+        video_file_clip = mp.VideoFileClip(filename=self.pathVideo + self.nameVideo)
         audio_clip = video_file_clip.audio
         path_audio = self.pathVideo + "Audio/"
         if not os.path.exists(path_audio):
-            os.makedirs(path_audio)
+            os.makedirs(name=path_audio)
         name_original_audio = "Audio" + str(self.nameVideo).split(".")[0] + ".wav"
-        audio_clip.write_audiofile(path_audio + name_original_audio, ffmpeg_params=["-ac", "1"])
+        audio_clip.write_audiofile(filename=path_audio + name_original_audio,
+                                   ffmpeg_params=["-ac", "1"])
         self.path_audio = path_audio
         self.name_original_audio = name_original_audio
         self.messages.insert(END, "Извлечение завершено\n")
 
     def filtering_audio(self):
         self.messages.insert(END, "Идет фильтрация извлеченного аудио...\n")
-        data_audio, sr = librosa.load(self.path_audio + self.name_original_audio, sr=self.SR)  # mono=False
+        data_audio, sr = librosa.load(path=self.path_audio + self.name_original_audio,
+                                      sr=self.SR)  # mono=False
         step = int((sr / 1000) * self.slice_ms)  # Always value parameter slice_ms should be >= 10
         count_step = math.ceil(len(data_audio) / step)  # This is so time video(step = fs_rate).
         # =========Готовим постоянные данные для фильтрации каждой части аудио============
@@ -56,92 +56,50 @@ class Audio_Processing:
             from_part_audio = i * step
             to_part_audio = from_part_audio + step
             part_data_audio = data_audio[from_part_audio:to_part_audio]
-            filtered_part_data_audio = lfilter(b, a, part_data_audio)
+            filtered_part_data_audio = lfilter(b=b,
+                                               a=a,
+                                               x=part_data_audio)
             self.filtered_data_audio[from_part_audio:to_part_audio] = filtered_part_data_audio
         self.nameFilteredAudio = "Filtered_" + self.name_original_audio
-        librosa.output.write_wav(self.path_audio + self.nameFilteredAudio, self.filtered_data_audio, sr=self.SR)
+        librosa.output.write_wav(path=self.path_audio + self.nameFilteredAudio,
+                                 y=self.filtered_data_audio,
+                                 sr=self.SR)
         self.messages.insert(END, "Фильтрация аудио завершена\n")
 
     def ExtractVoices(self, data, sr):
-        self.messages.insert(END, "Идет удаление тишины...\n")
+        self.messages.insert(END, "Идет извлечение голоса...\n")
         stepWindow = int((sr / 1000) * 200)
         partData = data[0:stepWindow]
         mu = np.sum(partData) / stepWindow
         sigma = np.sqrt(np.sum([(partData[i] - mu) ** 2 for i in range(stepWindow)]) / stepWindow)
         data = [data[i] - 0.95 * data[i - 1] for i in range(1, len(data))]
-        partsAudio = self.split_audio(data, sr, self.slice_ms, self.slice_ms)
+        partsAudio = split_audio(data, sr, self.slice_ms, self.slice_ms, self.messages)
         needParts = []
-        for part in partsAudio:
+        for i, part in enumerate(partsAudio):
             length = len([elem for elem in part if (np.absolute(elem - mu) / sigma) > 4])
             if length >= len(part) // 2:
                 needParts.append(part)
+                self.intervals_voices.append([i * self.slice_ms, (i + 1) * self.slice_ms])
+            else:
+                self.intervals_silence.append([i * self.slice_ms, (i + 1) * self.slice_ms])
         self.messages.insert(END, "Интервалы голоса образованы\n")
-        return np.array(needParts)
+        self.name_voices_audio = "voices.wav"
+        librosa.output.write_wav(path=self.path_audio + self.name_voices_audio,
+                                 y=np.array(needParts).flatten(),
+                                 sr=self.SR)
+        self.intervals_silence = self.getIntervals(intervals=self.intervals_silence)
+        self.intervals_voices = self.getIntervals(intervals=self.intervals_voices)
 
-    def split_audio(self, data, sr, window_ms, margin_ms):
-        self.messages.insert(END, "Идет дробление аудио...\n")
-        partsAudio = []
-        stepWindow = int((sr / 1000) * window_ms)
-        stepMargin = int((sr / 1000) * margin_ms)
-        for i in range(0, len(data), stepMargin):
-            partAudio = np.array(data[i:i + stepWindow])
-            if len(partAudio) == stepWindow:
-                partsAudio.append(partAudio)
-        self.messages.insert(END, "Образовались отдельные части аудио\n")
-        return partsAudio
-
-    def get_statistics(self, L):
-        dictionary = {}
-        for a in L:
-            if dictionary.get(a) is None:
-                dictionary[a] = 1
-            else:
-                dictionary[a] += 1
-        return dictionary
-
-    def extract_not_presenter(self, parts_audio):
-        self.messages.insert(END, "Идет выделение голосов посторонних ведущему...\n")
-        # parts_audio = self.split_audio(filtered_data_audio, self.SR, self.slice_ms, self.slice_ms)
-        # gender_classificatory = GenderClassificatory(self.pathAudio)
-        human_classificatory = HumanClassificatory(self.path_audio)
-        first_classification = []
-        for i, part in enumerate(parts_audio):
-            # genderPart = genderClassificatory.classification(self.SR, part)
-            human_part = human_classificatory.Classification(self.SR, part)
-            if human_part == "presenter":
-                first_classification.append("presenter")
-            else:
-                first_classification.append("not_presenter")
-        print(first_classification)
-        for i in range(len(first_classification)):
-            left = first_classification[i - self.area: i]
-            right = first_classification[i: i + self.area]
-            stat_left = self.get_statistics(left)
-            stat_right = self.get_statistics(right)
-            if len(stat_left) > 1 and len(stat_right) > 1:
-                stat = stat_right.copy()
-                for e in stat.keys():
-                    stat[e] = stat_left.get(e)
-                max_value = np.max(list(stat.values()))
-                new_human = [e for e in stat.keys() if stat.get(e) == max_value][0]
-                first_classification[i] = new_human
-        indexes = [i for i in range(len(first_classification)) if first_classification[i] == "not_presenter"]
-        intervals = []
+    def getIntervals(self, intervals):
         new_interval = True
-        for i in range(len(indexes)-1):
+        new_intervals = []
+        for interval in intervals:
             if new_interval:
-                interval = [indexes[i]*self.slice_ms]
-                if indexes[i+1] - indexes[i] > 1:
-                    interval.append((indexes[i]+1)*self.slice_ms)
-                    intervals.append(interval)
+                new_intervals.append(interval)
+                new_interval = False
+            else:
+                if interval[0] - new_intervals[len(new_intervals) - 1][1] > self.slice_ms:
+                    new_intervals.append(interval)
                 else:
-                    new_interval = False
-            elif (indexes[i+1] - indexes[i]) > 1:
-                interval.append((indexes[i]+1)*self.slice_ms)
-                intervals.append(interval)
-                interval = []
-                new_interval = True
-        self.messages.insert(END, "Интервалы времени выделены...\n")
-        print(intervals)
-        return intervals
-
+                    new_intervals[len(new_intervals) - 1][1] = interval[1]
+        return new_intervals

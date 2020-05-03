@@ -1,49 +1,36 @@
 from RESULT.VideoProcessing import Video_Processing
 from RESULT.AudioProcessing import Audio_Processing
-from RESULT.training_human import HumanClassificatory
-from tkinter import END
-import numpy as np
-import librosa
+from RESULT.training_presenter_classificator import ClassificatorPresenter
 
 
 class Main_Processing:
-    pathVideo = '/home/beslan/Diplom/Vebinar/'
-    nameVideo = 'PartVideo2.mp4'
-    pathTrain = "C:/Users/Ibrag/Desktop/Diplom/Datasets/Dataset2/development_set/"
-    interval_presenter = [12000, 15000]
+    intervals = []
 
     def __init__(self, pathVideo, nameVideo, messages):
         self.pathVideo = pathVideo
         self.nameVideo = nameVideo
         self.messages = messages
-        self.audioProcessing = Audio_Processing(pathVideo, nameVideo, messages)
+        self.audioProcessing = Audio_Processing(path_video=pathVideo,
+                                                name_video=nameVideo,
+                                                messages=messages)
 
-    def createClassificator(self, is_presenter, path_train, interval_presenter=None):
-        humanClassificatory = HumanClassificatory(self.audioProcessing.path_audio)
-        if not is_presenter:
-            self.messages.insert(END, "Идет создание классификатора остальных участников...\n")
-            humanClassificatory.Train(is_presenter=is_presenter, path_train_data=path_train)
-            self.messages.insert(END, "Создан классификатор остальных участников...\n")
-        else:
-            self.messages.insert(END, "Идет создание классификатора ведущего...\n")
-            interval_presenter = self.audioProcessing.SR * (np.array(interval_presenter) // 1000)
-            # partDataWithPresenter = self.audioProcessing.filtered_data_audio[
-            #                         interval_presenter[0]: interval_presenter[1]]
-            partDataWithPresenter = self.audioProcessing.filteredPartsData.flatten()[
-                                    interval_presenter[0]: interval_presenter[1]]
-            librosa.output.write_wav(self.audioProcessing.path_audio + "Part" + self.audioProcessing.nameFilteredAudio,
-                                     partDataWithPresenter, self.audioProcessing.SR)
-            humanClassificatory.Train(is_presenter=is_presenter, path_train_data=path_train,
-                                      x=partDataWithPresenter, sr=self.audioProcessing.SR)
-            self.messages.insert(END, "Создан классификатор ведущего...\n")
+    def GetIntervalsPresenter(self, interval_ms):
+        window_ms = self.audioProcessing.slice_ms
+        margin_ms = self.audioProcessing.slice_ms
+        self.classificator_presenter = ClassificatorPresenter(path_voices=self.audioProcessing.path_audio,
+                                                              name_voices=self.audioProcessing.name_voices_audio,
+                                                              interval_ms=interval_ms,
+                                                              window_ms=window_ms,
+                                                              margin_ms=margin_ms,
+                                                              messages=self.messages)
 
-    def getIntervals(self):
-        self.intervals = self.audioProcessing.extract_not_presenter(self.audioProcessing.filteredPartsData)
+    def videoAnalyse(self, intervals_not_presenter, split_interval_ms):
+        minNormalDistance = 2
+        maxNormalDistance = 15
+        self.videoProcessing = Video_Processing(path=self.pathVideo,
+                                                name=self.nameVideo,
+                                                intervals=intervals_not_presenter,
+                                                interval_ms=split_interval_ms,
+                                                minNormalDistance=minNormalDistance,
+                                                maxNormalDistance=maxNormalDistance)
 
-    def videoAnalyse(self):
-        # intervals = [[0, 5000], [10000, 20000]]
-        interval_ms = 500
-        normalDistance = 5
-        videoProcessing = Video_Processing(self.pathVideo, self.nameVideo, self.intervals, interval_ms, normalDistance)
-        # videoProcessing.PlayVideo()
-        videoProcessing.FindConferencionRegion()

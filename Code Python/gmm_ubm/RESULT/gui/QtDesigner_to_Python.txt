@@ -1,0 +1,1 @@
+./pyuic5.exe standart_window.ui -o ui_standart_window.py

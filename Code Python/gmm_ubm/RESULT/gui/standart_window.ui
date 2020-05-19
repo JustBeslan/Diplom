@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1194</width>
+    <height>765</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Анализ вебинаров</string>
+  </property>
+  <widget class="QPushButton" name="nextButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>1030</x>
+     <y>700</y>
+     <width>151</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Далее</string>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="windows">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>1181</width>
+     <height>500</height>
+    </rect>
+   </property>
+   <property name="tabPosition">
+    <enum>QTabWidget::North</enum>
+   </property>
+   <property name="tabShape">
+    <enum>QTabWidget::Triangular</enum>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <property name="usesScrollButtons">
+    <bool>false</bool>
+   </property>
+   <property name="documentMode">
+    <bool>false</bool>
+   </property>
+   <property name="tabsClosable">
+    <bool>false</bool>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="tabBarAutoHide">
+    <bool>false</bool>
+   </property>
+   <widget class="QWidget" name="window_1">
+    <attribute name="title">
+     <string/>
+    </attribute>
+    <widget class="QPushButton" name="extractSilenceButton">
+     <property name="geometry">
+      <rect>
+       <x>201</x>
+       <y>397</y>
+       <width>300</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Извлечь интервалы тишины</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="settingsParameters_groupBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>491</width>
+       <height>191</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Настройка параметров</string>
+     </property>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>94</x>
+        <y>40</y>
+        <width>130</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Разбить по : </string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="settingsParameters_splitMs">
+      <property name="geometry">
+       <rect>
+        <x>223</x>
+        <y>40</y>
+        <width>120</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>10</number>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>25</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>347</x>
+        <y>40</y>
+        <width>130</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>миллисекунд</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="settingsParameters_setButton">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>130</y>
+        <width>131</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Установить</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>82</y>
+        <width>210</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Допустимая пауза в : </string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="settingsParameters_maxSilenceMs">
+      <property name="geometry">
+       <rect>
+        <x>221</x>
+        <y>84</y>
+        <width>120</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>10</number>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+      <property name="value">
+       <number>300</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>345</x>
+        <y>85</y>
+        <width>130</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>миллисекунд</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="loadVideo_groupBox">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>20</y>
+       <width>991</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>Загрузка видео</string>
+     </property>
+     <widget class="QToolButton" name="loadVideo_pathButton">
+      <property name="geometry">
+       <rect>
+        <x>800</x>
+        <y>40</y>
+        <width>161</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Выбрать</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="loadVideo_pathEdit">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>781</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="placeholderText">
+       <string>Путь к вебинару</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="loadVideo_loadButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>110</y>
+        <width>151</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Загрузить видео</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QPushButton" name="filterButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>397</y>
+       <width>180</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Отфильтровать</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="statusProcesses_groupBox">
+     <property name="geometry">
+      <rect>
+       <x>510</x>
+       <y>200</y>
+       <width>651</width>
+       <height>261</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Статус процессов</string>
+     </property>
+     <widget class="QTextEdit" name="textBox_status">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>631</width>
+        <height>211</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="window_2">
+    <attribute name="title">
+     <string/>
+    </attribute>
+    <widget class="QGroupBox" name="statusProcesses_groupBox_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>170</y>
+       <width>310</width>
+       <height>290</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Статусы процессов</string>
+     </property>
+     <widget class="QTextEdit" name="textBox_status_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>290</width>
+        <height>250</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="typeWork_groupBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>310</width>
+       <height>160</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Режимы работы</string>
+     </property>
+     <widget class="QRadioButton" name="manuallyWork_radioButton">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>300</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Ручной режим</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="semiautomaticWork_radioButton">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>80</y>
+        <width>300</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Полуавтоматический режим</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="saveMode_button">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>110</y>
+        <width>110</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Принять</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="settingsIntervals_groupBox">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>120</y>
+       <width>820</width>
+       <height>340</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Настройка интервалов</string>
+     </property>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>30</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>От</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>30</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>До</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="addChange_button">
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>20</y>
+        <width>150</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="intervals1_groupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>390</width>
+        <height>230</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>1</string>
+      </property>
+      <widget class="QListWidget" name="intervals1_listBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>370</width>
+         <height>190</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="intervals2_groupBox">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>70</y>
+        <width>400</width>
+        <height>230</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>2</string>
+      </property>
+      <widget class="QListWidget" name="intervals2_listBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>380</width>
+         <height>190</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="deleteInterval_button">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>300</y>
+        <width>110</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Удалить</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="clearAllIntervals_button">
+      <property name="geometry">
+       <rect>
+        <x>210</x>
+        <y>300</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Очистить все</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="addAllIntervals_button">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>300</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Добавить все</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="saveIntervals_button">
+      <property name="geometry">
+       <rect>
+        <x>690</x>
+        <y>300</y>
+        <width>120</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Сохранить</string>
+      </property>
+     </widget>
+     <widget class="QTimeEdit" name="fromInterval_timeEdit">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>26</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="displayFormat">
+       <string>HH.mm.ss.zzz</string>
+      </property>
+     </widget>
+     <widget class="QTimeEdit" name="toInterval_timeEdit">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>25</y>
+        <width>140</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="displayFormat">
+       <string>HH.mm.ss.zzz</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="trainClassificator_groupBox">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>10</y>
+       <width>820</width>
+       <height>110</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Интервал голоса ведущего для классификатора</string>
+     </property>
+     <widget class="QSpinBox" name="toIntervalClassificatorPresenter">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>50</y>
+        <width>120</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000000000</number>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="fromIntervalClassificatorPresenter">
+      <property name="geometry">
+       <rect>
+        <x>101</x>
+        <y>50</y>
+        <width>120</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="maximum">
+       <number>1000000000</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>50</y>
+        <width>110</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>От (в мс)</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>50</y>
+        <width>90</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>До (в мс)</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="trainClassificator_button">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>40</y>
+        <width>150</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Тренировать</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QTabWidget" name="tab_intervals">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>520</y>
+     <width>1001</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="tabPosition">
+    <enum>QTabWidget::North</enum>
+   </property>
+   <property name="currentIndex">
+    <number>3</number>
+   </property>
+   <widget class="QWidget" name="tab_intervalsSilence">
+    <attribute name="title">
+     <string>Интервалы тишины</string>
+    </attribute>
+    <widget class="QTextEdit" name="textBox_intervalsSilence">
+     <property name="geometry">
+      <rect>
+       <x>13</x>
+       <y>20</y>
+       <width>971</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>Интервалы еще не выделены</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_intervalsPresenter">
+    <attribute name="title">
+     <string>Интервалы разговора ведущего</string>
+    </attribute>
+    <widget class="QTextEdit" name="textBox_intervalsPresenter">
+     <property name="geometry">
+      <rect>
+       <x>13</x>
+       <y>20</y>
+       <width>970</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>Интервалы еще не выделены</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_intervalsSomeone">
+    <attribute name="title">
+     <string>Интервалы разговора участника</string>
+    </attribute>
+    <widget class="QTextEdit" name="textBox_intervalsSomeone">
+     <property name="geometry">
+      <rect>
+       <x>13</x>
+       <y>20</y>
+       <width>971</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>Интервалы еще не выделены</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_intervalsTogether">
+    <attribute name="title">
+     <string>Интервалы разговора ведущего и участника</string>
+    </attribute>
+    <widget class="QTextEdit" name="textBox_intervalsTogether">
+     <property name="geometry">
+      <rect>
+       <x>13</x>
+       <y>20</y>
+       <width>971</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>Интервалы еще не выделены</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

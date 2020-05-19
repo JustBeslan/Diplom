@@ -1,5 +1,32 @@
-from tkinter import END
 import numpy as np
+
+
+def correct2_intervals(intervalsA, intervalsB):
+    result_intervalsB = []
+    for intervalB in intervalsB:
+        main_interval = []
+        for intervalA in intervalsA:
+            if intervalB[0] > intervalA[0] and intervalB[1] < intervalA[1]:
+                main_interval = intervalA
+                break
+        if not main_interval:
+            result_intervalsB.append(intervalB)
+    return result_intervalsB
+
+
+def correct_intervals(intervals, maxSilence):
+    new_interval = True
+    new_intervals = []
+    for interval in intervals:
+        if new_interval:
+            new_intervals.append(interval)
+            new_interval = False
+        else:
+            if interval[0] - new_intervals[len(new_intervals) - 1][1] > maxSilence:
+                new_intervals.append(interval)
+            else:
+                new_intervals[len(new_intervals) - 1][1] = interval[1]
+    return new_intervals
 
 
 def getIntervalsPresenter(intervals_voices, intervals_not_presenter):
@@ -21,8 +48,7 @@ def getIntervalsPresenter(intervals_voices, intervals_not_presenter):
     return intervals_presenter
 
 
-def split_audio(data, sr, window_ms, margin_ms, messages):
-    messages.insert(END, "Идет разделение аудио...\n")
+def split_audio(data, sr, window_ms, margin_ms):
     partsAudio = []
     stepWindow = int((sr / 1000) * window_ms)
     stepMargin = int((sr / 1000) * margin_ms)
@@ -30,5 +56,4 @@ def split_audio(data, sr, window_ms, margin_ms, messages):
         partAudio = np.array(data[i:i + stepWindow])
         if len(partAudio) == stepWindow:
             partsAudio.append(partAudio)
-    messages.insert(END, "Отдельные части аудио образованы\n")
     return partsAudio

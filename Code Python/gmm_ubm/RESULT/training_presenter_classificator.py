@@ -6,15 +6,14 @@ from RESULT.OtherProcessing import split_audio
 
 
 class ClassificatorPresenter:
-    def __init__(self, path_voices, name_voices, interval_ms, window_ms, margin_ms, messages):
+    def __init__(self, path_voices, name_voices, interval_ms, window_ms, margin_ms):
         self.window_ms = window_ms
         self.margin_ms = margin_ms
         self.sr, data = wav.read(filename=path_voices + name_voices)
         self.split_data = split_audio(data=data,
                                       sr=self.sr,
                                       window_ms=window_ms,
-                                      margin_ms=margin_ms,
-                                      messages=messages)
+                                      margin_ms=margin_ms)
         self.intervals_split_data = [[i * window_ms, (i + 1) * window_ms] for i in range(len(self.split_data))]
         self.features_split_data = [self.ExtractFeatures(part_split_data) for part_split_data in self.split_data]
         self.indexes_intervals_presenter = [i for i, interval in enumerate(self.intervals_split_data)

@@ -6,13 +6,11 @@ from RESULT.training_presenter_classificator import ClassificatorPresenter
 class Main_Processing:
     intervals = []
 
-    def __init__(self, pathVideo, nameVideo, messages):
+    def __init__(self, pathVideo, nameVideo):
         self.pathVideo = pathVideo
         self.nameVideo = nameVideo
-        self.messages = messages
         self.audioProcessing = Audio_Processing(path_video=pathVideo,
-                                                name_video=nameVideo,
-                                                messages=messages)
+                                                name_video=nameVideo)
 
     def GetIntervalsPresenter(self, interval_ms):
         window_ms = self.audioProcessing.slice_ms
@@ -21,8 +19,7 @@ class Main_Processing:
                                                               name_voices=self.audioProcessing.name_voices_audio,
                                                               interval_ms=interval_ms,
                                                               window_ms=window_ms,
-                                                              margin_ms=margin_ms,
-                                                              messages=self.messages)
+                                                              margin_ms=margin_ms)
 
     def videoAnalyse(self, intervals_not_presenter, split_interval_ms):
         minNormalDistance = 2

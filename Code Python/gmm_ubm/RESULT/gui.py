@@ -2,7 +2,7 @@ from tkinter import *
 from RESULT.WindowLoadVideo import WindowLoadVideo
 from RESULT.WindowChooseMode import WindowChooseMode
 from RESULT.WindowInputManually import windowInputManually
-from RESULT.OtherProcessing import getIntervalsPresenter
+from RESULT.OtherProcessing import extractOtherIntervals
 from RESULT.WindowCorrectIntervals import CorrectIntervals
 
 global current_window, main_processing
@@ -26,7 +26,7 @@ def manageWindows(main_window, messages):
     if current_window[0] == 1:
         current_window[1].audioProcessing1()
         main_processing = current_window[1].main_processing
-        intervals_voices = main_processing.audioProcessing.intervals_voices
+        intervals_voices = main_processing.audioProcessing.corrected_intervals_voices
         intervals_silence = main_processing.audioProcessing.intervals_silence
         current_window[1].pack_forget()
         messages.delete(1.0, END)
@@ -37,7 +37,7 @@ def manageWindows(main_window, messages):
         child_window = Toplevel(master=main_window)
         child_window.title = 'Ручная настройка интервалов'
         child_window.focus_set()
-        intervals_voices = main_processing.audioProcessing.intervals_voices
+        intervals_voices = main_processing.audioProcessing.corrected_intervals_voices
         if current_window[1].choose.get() == 0:
             window3 = windowInputManually(parent=child_window,
                                           intervals_voices=intervals_voices,
@@ -52,8 +52,8 @@ def manageWindows(main_window, messages):
         child_window.mainloop()
     elif current_window[0] == 3:
         intervals_not_presenter = current_window[1].intervals_not_presenter
-        intervals_presenter = getIntervalsPresenter(intervals_voices=intervals_voices,
-                                                    intervals_not_presenter=intervals_not_presenter)
+        intervals_presenter = extractOtherIntervals(intervalsA=intervals_voices,
+                                                    intervalsB=intervals_not_presenter)
         messages.insert(END, 'Идет обработка последовательности картинок...\n')
         main_processing.videoAnalyse(intervals_not_presenter=intervals_not_presenter,
                                      split_interval_ms=main_processing.audioProcessing.slice_ms)

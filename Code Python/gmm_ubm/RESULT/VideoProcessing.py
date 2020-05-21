@@ -11,7 +11,7 @@ class Video_Processing:
     intervals_someone = []
     interval = []
 
-    def __init__(self, path, name, intervals, interval_ms, minNormalDistance, maxNormalDistance):
+    def __init__(self, path, name, intervals, interval_ms, minNormalDistance, maxNormalDistance, show):
         self.video = cv.VideoCapture(path + name)
         self.intervals = intervals
         self.interval_ms = interval_ms
@@ -19,6 +19,7 @@ class Video_Processing:
         self.maxNormalDistance = maxNormalDistance
         self.detector = dlib.get_frontal_face_detector()
         self.predictor = dlib.shape_predictor(path + 'shape_predictor_68_face_landmarks.dat')
+        self.show = show
         countFrame = int(self.video.get(cv.CAP_PROP_FRAME_COUNT))
         fps = int(self.video.get(cv.CAP_PROP_FPS))
         self.timeVideo = countFrame / fps
@@ -40,6 +41,8 @@ class Video_Processing:
         cv.destroyAllWindows()
 
     def FindConferencionRegion(self):
+        print(self.intervals)
+        print(self.interval_ms)
         i = 0
         j = 0
         b = True
@@ -83,9 +86,9 @@ class Video_Processing:
         hsv = cv.cvtColor(src=threshold,
                           code=cv.COLOR_BGR2HSV)
         canny = cv.Canny(hsv, 10, 527)
-        contours, hierarchy = cv.findContours(image=canny,
-                                              mode=cv.RETR_EXTERNAL,
-                                              method=cv.CHAIN_APPROX_SIMPLE)
+        image, contours, hierarchy = cv.findContours(image=canny,
+                                                     mode=cv.RETR_EXTERNAL,
+                                                     method=cv.CHAIN_APPROX_SIMPLE)
         imagesTitles = []
         for contour in contours:
             minAreaRect = cv.minAreaRect(points=contour)
@@ -139,7 +142,7 @@ class Video_Processing:
 
         if len(faces1) + len(faces2) > 0:
             if len(faces1) == 0 or len(faces2) == 0:
-                print("Presenter not say")
+                # print("Presenter not say")
                 self.intervals_someone.append(self.interval)
             else:
                 face1Presenter = faces1[0]
@@ -154,14 +157,11 @@ class Video_Processing:
                     distances.append(distance)
                 check_say_presenter = [distance for distance in distances
                                        if self.minNormalDistance <= distance <= self.maxNormalDistance]
-                if len(check_say_presenter) >= len(distances)//2:
-                    print("Presenter say")
-                    self.intervals_together.append(self.interval)
-                else:
-                    print("Presenter not say")
+                if len(check_say_presenter) < len(distances) // 2:
+                    # print("Presenter not say")
                     self.intervals_someone.append(self.interval)
         else:
-            print("Presenter is not found")
+            # print("Presenter is not found")
             self.intervals_someone.append(self.interval)
-        cv.imshow('Video', image1RegionConferencion)
-
+        if self.show:
+            cv.imshow('Video', image1RegionConferencion)

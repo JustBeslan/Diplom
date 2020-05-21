@@ -50,7 +50,7 @@
     <enum>QTabWidget::Triangular</enum>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <property name="usesScrollButtons">
     <bool>false</bool>
@@ -94,14 +94,14 @@
       </rect>
      </property>
      <property name="title">
-      <string>Настройка параметров</string>
+      <string>Установка параметров</string>
      </property>
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>94</x>
+        <x>120</x>
         <y>40</y>
-        <width>130</width>
+        <width>100</width>
         <height>31</height>
        </rect>
       </property>
@@ -157,9 +157,9 @@
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>50</x>
         <y>82</y>
-        <width>210</width>
+        <width>170</width>
         <height>30</height>
        </rect>
       </property>
@@ -490,6 +490,9 @@
        <property name="selectionMode">
         <enum>QAbstractItemView::ExtendedSelection</enum>
        </property>
+       <property name="sortingEnabled">
+        <bool>false</bool>
+       </property>
       </widget>
      </widget>
      <widget class="QGroupBox" name="intervals2_groupBox">
@@ -520,6 +523,9 @@
        </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::ExtendedSelection</enum>
+       </property>
+       <property name="sortingEnabled">
+        <bool>false</bool>
        </property>
       </widget>
      </widget>
@@ -614,63 +620,37 @@
      <property name="title">
       <string>Интервал голоса ведущего для классификатора</string>
      </property>
-     <widget class="QSpinBox" name="toIntervalClassificatorPresenter">
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>50</y>
-        <width>120</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>1000000000</number>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="fromIntervalClassificatorPresenter">
-      <property name="geometry">
-       <rect>
-        <x>101</x>
-        <y>50</y>
-        <width>120</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="maximum">
-       <number>1000000000</number>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>50</y>
-        <width>110</width>
+        <x>40</x>
+        <y>53</y>
+        <width>30</width>
         <height>30</height>
        </rect>
       </property>
       <property name="text">
-       <string>От (в мс)</string>
+       <string>От</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>50</y>
-        <width>90</width>
+        <x>240</x>
+        <y>53</y>
+        <width>30</width>
         <height>30</height>
        </rect>
       </property>
       <property name="text">
-       <string>До (в мс)</string>
+       <string>До</string>
       </property>
      </widget>
      <widget class="QPushButton" name="trainClassificator_button">
       <property name="geometry">
        <rect>
-        <x>470</x>
-        <y>40</y>
+        <x>460</x>
+        <y>43</y>
         <width>150</width>
         <height>50</height>
        </rect>
@@ -679,6 +659,237 @@
        <string>Тренировать</string>
       </property>
      </widget>
+     <widget class="QTimeEdit" name="fromIntervalPresenter_timeEdit">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>50</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="displayFormat">
+       <string>HH.mm.ss.zzz</string>
+      </property>
+     </widget>
+     <widget class="QTimeEdit" name="toIntervalPresenter_timeEdit">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>50</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="displayFormat">
+       <string>HH.mm.ss.zzz</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string/>
+    </attribute>
+    <widget class="QGroupBox" name="statusProcesses_groupBox_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>530</width>
+       <height>230</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Статусы процессов</string>
+     </property>
+     <widget class="QTextEdit" name="textBox_status_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>510</width>
+        <height>190</height>
+       </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="setParameters_groupBox">
+     <property name="geometry">
+      <rect>
+       <x>550</x>
+       <y>20</y>
+       <width>610</width>
+       <height>320</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Установка параметров</string>
+     </property>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>30</y>
+        <width>210</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Минимальное расстояние</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="minDistance_spinBox">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>20</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>2</number>
+      </property>
+      <property name="maximum">
+       <number>5</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>80</y>
+        <width>210</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Максимальное расстояние</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="maxDistance_spinBox">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>70</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>7</number>
+      </property>
+      <property name="maximum">
+       <number>20</number>
+      </property>
+      <property name="value">
+       <number>15</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="setParameters_button">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>260</y>
+        <width>150</width>
+        <height>50</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Установить</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="showRegionConference_checkBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>190</y>
+        <width>440</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Показывать область конференции во время анализа</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="saveAllIntervalsInFiles_checkBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>220</y>
+        <width>400</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Сохранить все полученные интервалы в файлы</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>130</y>
+        <width>320</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Время между анализируемыми кадрами</string>
+      </property>
+     </widget>
+     <widget class="QSpinBox" name="timeBetweenFrames_spinBox">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>120</y>
+        <width>140</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="minimum">
+       <number>25</number>
+      </property>
+      <property name="maximum">
+       <number>1000</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>130</y>
+        <width>110</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>миллисекунд</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QPushButton" name="startVideoAnalyze_button">
+     <property name="geometry">
+      <rect>
+       <x>1020</x>
+       <y>350</y>
+       <width>140</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Начать</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -700,7 +911,7 @@
     <enum>QTabWidget::North</enum>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="tab_intervalsSilence">
     <attribute name="title">

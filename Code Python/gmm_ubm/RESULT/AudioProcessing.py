@@ -4,7 +4,7 @@ import librosa
 import numpy as np
 import moviepy.editor as mp
 from scipy.signal import butter, lfilter
-from RESULT.OtherProcessing import split_audio, correct_intervals
+from RESULT.OtherProcessing import *
 
 
 class Audio_Processing:
@@ -72,16 +72,21 @@ class Audio_Processing:
         needParts = []
         for i, part in enumerate(partsAudio):
             length = len([elem for elem in part if (np.absolute(elem - mu) / sigma) > 5])
-            if length >= len(part) // 2:
-                needParts.append(part)
-                self.intervals_voices.append([i * self.slice_ms, (i + 1) * self.slice_ms])
-            else:
-                self.intervals_silence.append([i * self.slice_ms, (i + 1) * self.slice_ms])
+            interval = [i * self.slice_ms, (i + 1) * self.slice_ms]
+            if length < len(part) // 2:
+                self.intervals_silence.append(interval)
+        self.intervals_silence = correct_intervals(intervals=self.intervals_silence,
+                                                   maxSilence=self.maxSilenceMs)
+        self.intervals_silence = [interval for interval in self.intervals_silence
+                                  if abs(interval[1] - interval[0]) >= self.maxSilenceMs]
+        main_interval = [0, len(partsAudio)*self.slice_ms]
+        intervals_voices = extractOtherIntervals([main_interval], self.intervals_silence)
+        for interval_voices in intervals_voices:
+            self.intervals_voices = self.intervals_voices + split_interval(interval=interval_voices,
+                                                                           len_split=self.slice_ms)
+        needParts = [part for i, part in enumerate(partsAudio)
+                     if [i * self.slice_ms, (i + 1) * self.slice_ms] in self.intervals_voices]
         self.name_voices_audio = "voices.wav"
         librosa.output.write_wav(path=self.path_audio + self.name_voices_audio,
                                  y=np.array(needParts).flatten(),
                                  sr=self.SR)
-        self.intervals_silence = correct_intervals(intervals=self.intervals_silence,
-                                                   maxSilence=self.slice_ms)
-        self.intervals_voices = correct_intervals(intervals=self.intervals_voices,
-                                                  maxSilence=self.slice_ms)

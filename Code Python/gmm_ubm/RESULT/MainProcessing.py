@@ -21,13 +21,12 @@ class Main_Processing:
                                                               window_ms=window_ms,
                                                               margin_ms=margin_ms)
 
-    def videoAnalyse(self, intervals_not_presenter, split_interval_ms):
-        minNormalDistance = 2
-        maxNormalDistance = 15
+    def videoAnalyse(self, intervals_not_presenter, minNormalDistance, maxNormalDistance, split_interval_ms, show):
         self.videoProcessing = Video_Processing(path=self.pathVideo,
                                                 name=self.nameVideo,
                                                 intervals=intervals_not_presenter,
                                                 interval_ms=split_interval_ms,
                                                 minNormalDistance=minNormalDistance,
-                                                maxNormalDistance=maxNormalDistance)
+                                                maxNormalDistance=maxNormalDistance,
+                                                show=show)
 

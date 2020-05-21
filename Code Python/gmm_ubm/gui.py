@@ -27,7 +27,7 @@ class NewThread(Thread):
             global intervals_silence
             intervals_silence = main_processing.audioProcessing.intervals_silence
             global intervals_voices
-            intervals_voices = main_processing.audioProcessing.intervals_voices
+            intervals_voices = main_processing.audioProcessing.corrected_intervals_voices
             messages.insert(END, 'Нажмите "Далее"\n')
         if self.id == 2:
             messages.insert(END, 'Идет обработка последовательности картинок...\n')

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QFileDialog
 from RESULT.MainProcessing import Main_Processing
 from threading import Thread
-from RESULT.OtherProcessing import correct_intervals, correct2_intervals
+from RESULT.OtherProcessing import correct_intervals, correct2_intervals, msToTime
 
 
 class window1:
@@ -26,17 +26,16 @@ class window1:
         t.join()
         mainGUI.textBox_status.append("Извлечение тишины из аудио завершено!\n")
         mainGUI.textBox_status.append("Нажмите 'Далее'!\n")
-        self.main_Processing.audioProcessing.intervals_silence = \
-            correct_intervals(intervals=self.main_Processing.audioProcessing.intervals_silence,
-                              maxSilence=self.main_Processing.audioProcessing.maxSilenceMs)
-        self.main_Processing.audioProcessing.intervals_voices = \
-            correct2_intervals(intervalsA=self.main_Processing.audioProcessing.intervals_silence,
-                               intervalsB=self.main_Processing.audioProcessing.intervals_voices)
         for interval in self.main_Processing.audioProcessing.intervals_silence:
-            mainGUI.textBox_intervalsSilence.append(str(interval[0]) + ' - ' + str(interval[1]))
+            hours_interval, minutes_interval, seconds_interval, milliseconds_interval = msToTime(interval)
+            mainGUI.textBox_intervalsSilence.append(
+                str(hours_interval[0]) + '.' + str(minutes_interval[0]) + '.' + str(
+                    seconds_interval[0]) + '.' + str(milliseconds_interval[0]) + '__' + str(
+                    interval[0]) + ' - ' +
+                str(hours_interval[1]) + '.' + str(minutes_interval[1]) + '.' + str(
+                    seconds_interval[1]) + '.' + str(milliseconds_interval[1]) + '__' + str(
+                    interval[1]) + "\n")
         mainGUI.nextButton.setEnabled(True)
-        print(self.main_Processing.audioProcessing.intervals_silence)
-        print(self.main_Processing.audioProcessing.intervals_voices)
 
     def filteringAudio(self, mainGUI):
         mainGUI.filterButton.setEnabled(False)

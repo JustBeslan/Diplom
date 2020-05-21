@@ -1,5 +1,28 @@
 import numpy as np
 
+msec_in_hour = 3600000
+msec_in_minute = 60000
+msec_in_sec = 1000
+
+
+def msToTime(interval):
+    interval = np.array(interval)
+    hours_interval = interval // msec_in_hour
+    minutes_interval = (interval -
+                        hours_interval * msec_in_hour) // msec_in_minute
+    seconds_interval = (interval -
+                        hours_interval * msec_in_hour -
+                        minutes_interval * msec_in_minute) // msec_in_sec
+    milliseconds_interval = (interval -
+                             hours_interval * msec_in_hour -
+                             minutes_interval * msec_in_minute -
+                             seconds_interval * msec_in_sec)
+    return hours_interval, minutes_interval, seconds_interval, milliseconds_interval
+
+
+def timeToMS(time):
+    return time.hour() * msec_in_hour + time.minute() * msec_in_minute + time.second() * msec_in_sec + time.msec()
+
 
 def correct2_intervals(intervalsA, intervalsB):
     result_intervalsB = []
@@ -15,38 +38,44 @@ def correct2_intervals(intervalsA, intervalsB):
 
 
 def correct_intervals(intervals, maxSilence):
-    new_interval = True
-    new_intervals = []
-    for interval in intervals:
-        if new_interval:
-            new_intervals.append(interval)
-            new_interval = False
+    if len(intervals) > 0:
+        new_intervals = [list(intervals[0]).copy()]
+        s = 1
+    else:
+        new_intervals = []
+        s = 0
+    for i in range(s, len(intervals)):
+        if abs(intervals[i][0] - new_intervals[len(new_intervals) - 1][1]) <= maxSilence:
+            new_intervals[len(new_intervals) - 1][1] = intervals[i][1]
         else:
-            if interval[0] - new_intervals[len(new_intervals) - 1][1] > maxSilence:
-                new_intervals.append(interval)
-            else:
-                new_intervals[len(new_intervals) - 1][1] = interval[1]
+            new_intervals.append(list(intervals[i]).copy())
     return new_intervals
 
 
-def getIntervalsPresenter(intervals_voices, intervals_not_presenter):
-    intervals_presenter = []
-    for interval_voice in intervals_voices:
-        found_intervals = [interval_presenter for interval_presenter in intervals_not_presenter
-                           if interval_presenter[0] >= interval_voice[0]
-                           and interval_presenter[1] <= interval_voice[1]]
-        if len(found_intervals) > 0:
-            for i in range(len(found_intervals)):
-                if i == 0 and interval_voice[0] < found_intervals[i][0]:
-                    intervals_presenter.append([interval_voice[0], found_intervals[i][0]])
-                if i == len(found_intervals) - 1 and found_intervals[i][1] < interval_voice[1]:
-                    intervals_presenter.append([found_intervals[i][1], interval_voice[1]])
-                if 0 < i <= len(found_intervals) - 1 and found_intervals[i - 1][1] < found_intervals[i][0]:
-                    intervals_presenter.append([found_intervals[i - 1][1], found_intervals[i][0]])
+def extractOtherIntervals(intervalsA, intervalsB):
+    otherIntervals = []
+    for intervalA in intervalsA:
+        foundSubIntervals = [intervalB for intervalB in intervalsB
+                             if intervalB[0] >= intervalA[0] and intervalB[1] <= intervalA[1]]
+        if len(foundSubIntervals) > 0:
+            for i in range(len(foundSubIntervals)):
+                if i == 0 and intervalA[0] < foundSubIntervals[i][0]:
+                    otherIntervals.append([intervalA[0], foundSubIntervals[i][0]])
+                if i == len(foundSubIntervals) - 1 and foundSubIntervals[i][1] < intervalA[1]:
+                    otherIntervals.append([foundSubIntervals[i][1], intervalA[1]])
+                if 0 < i <= len(foundSubIntervals) - 1 and foundSubIntervals[i - 1][1] < foundSubIntervals[i][0]:
+                    otherIntervals.append([foundSubIntervals[i - 1][1], foundSubIntervals[i][0]])
         else:
-            intervals_presenter.append(interval_voice)
-    return intervals_presenter
+            otherIntervals.append(intervalA)
+    return otherIntervals
 
+
+# print(extractOtherIntervals([[0, 1200], [1500, 1700]], [[100, 200], [576, 1034], [1500, 1560], [1560, 1600]]))
+def split_interval(interval, len_split):
+    intervals = []
+    for i in range(abs(interval[1] - interval[0])//len_split):
+        intervals.append([interval[0] + i * len_split, interval[0] + (i + 1) * len_split])
+    return intervals
 
 def split_audio(data, sr, window_ms, margin_ms):
     partsAudio = []

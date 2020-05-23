@@ -10,12 +10,17 @@ from RESULT.OtherProcessing import *
 class Audio_Processing:
     SR = 16000
     intervals_silence = []
+    data_silence = []
     intervals_voices = []
+    data_voices = []
 
     def __init__(self, path_video, name_video):
         self.nameVideo = name_video
         self.pathVideo = path_video
         self.to_extract_audio_from_video()
+
+    def set_minLengthFrameMs(self, ms):
+        self.minLengthFrameMs = ms
 
     def set_sliceMs(self, ms):
         self.slice_ms = ms
@@ -68,25 +73,33 @@ class Audio_Processing:
         mu = np.sum(partData) / stepWindow
         sigma = np.sqrt(np.sum([(partData[i] - mu) ** 2 for i in range(stepWindow)]) / stepWindow)
         data = [data[i] - 0.95 * data[i - 1] for i in range(1, len(data))]
-        partsAudio = split_audio(data, sr, self.slice_ms, self.slice_ms)
-        needParts = []
-        for i, part in enumerate(partsAudio):
+        self.partsAudio = split_audio(data, sr, self.slice_ms, self.slice_ms)
+        for i, part in enumerate(self.partsAudio):
             length = len([elem for elem in part if (np.absolute(elem - mu) / sigma) > 5])
             interval = [i * self.slice_ms, (i + 1) * self.slice_ms]
             if length < len(part) // 2:
                 self.intervals_silence.append(interval)
+        self.finishedProcessing()
+
+    def finishedProcessing(self):
         self.intervals_silence = correct_intervals(intervals=self.intervals_silence,
                                                    maxSilence=self.maxSilenceMs)
         self.intervals_silence = [interval for interval in self.intervals_silence
-                                  if abs(interval[1] - interval[0]) >= self.maxSilenceMs]
-        main_interval = [0, len(partsAudio)*self.slice_ms]
+                                  if abs(interval[1] - interval[0]) >= self.minLengthFrameMs]
+        main_interval = [0, len(self.partsAudio) * self.slice_ms]
         intervals_voices = extractOtherIntervals([main_interval], self.intervals_silence)
+        self.intervals_voices = []
         for interval_voices in intervals_voices:
             self.intervals_voices = self.intervals_voices + split_interval(interval=interval_voices,
                                                                            len_split=self.slice_ms)
-        needParts = [part for i, part in enumerate(partsAudio)
-                     if [i * self.slice_ms, (i + 1) * self.slice_ms] in self.intervals_voices]
+
+        self.data_voices = [part for i, part in enumerate(self.partsAudio)
+                            if [i * self.slice_ms, (i + 1) * self.slice_ms] in self.intervals_voices]
+        for interval in self.intervals_silence:
+            self.data_silence.append([])
+            for j in range(interval[0]//self.slice_ms, interval[1]//self.slice_ms):
+                self.data_silence[len(self.data_silence)-1] = self.data_silence[len(self.data_silence)-1] + [list(self.partsAudio[j].flatten())]
         self.name_voices_audio = "voices.wav"
         librosa.output.write_wav(path=self.path_audio + self.name_voices_audio,
-                                 y=np.array(needParts).flatten(),
+                                 y=np.array(self.data_voices).flatten(),
                                  sr=self.SR)

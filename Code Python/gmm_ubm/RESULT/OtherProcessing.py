@@ -5,6 +5,30 @@ msec_in_minute = 60000
 msec_in_sec = 1000
 
 
+def insertInTextBoxIntervals(intervals, textbox):
+    for interval in intervals:
+        hours_interval, minutes_interval, seconds_interval, milliseconds_interval = msToTime(interval)
+        textbox.append(
+            str(hours_interval[0]) + '.' + str(minutes_interval[0]) + '.' + str(
+                seconds_interval[0]) + '.' + str(milliseconds_interval[0]) + '__' + str(
+                interval[0]) + ' - ' +
+            str(hours_interval[1]) + '.' + str(minutes_interval[1]) + '.' + str(
+                seconds_interval[1]) + '.' + str(milliseconds_interval[1]) + '__' + str(
+                interval[1]) + "\n")
+
+
+def isIntersectionIntervals(interval1, interval2):
+    interval1 = str(interval1).split(' - ')
+    interval1 = [int(interval1[0].split('__')[1]), int(interval1[1].split('__')[1])]
+    interval2 = str(interval2).split(' - ')
+    interval2 = [int(interval2[0].split('__')[1]), int(interval2[1].split('__')[1])]
+    if interval2[0] < interval1[0] < interval2[1] or interval2[0] < interval1[1] < interval2[1]:
+        return True
+    if interval1[0] < interval2[0] < interval1[1] or interval1[0] < interval2[1] < interval1[1]:
+        return True
+    return False
+
+
 def msToTime(interval):
     interval = np.array(interval)
     hours_interval = interval // msec_in_hour
@@ -70,12 +94,12 @@ def extractOtherIntervals(intervalsA, intervalsB):
     return otherIntervals
 
 
-# print(extractOtherIntervals([[0, 1200], [1500, 1700]], [[100, 200], [576, 1034], [1500, 1560], [1560, 1600]]))
 def split_interval(interval, len_split):
     intervals = []
-    for i in range(abs(interval[1] - interval[0])//len_split):
+    for i in range(abs(interval[1] - interval[0]) // len_split):
         intervals.append([interval[0] + i * len_split, interval[0] + (i + 1) * len_split])
     return intervals
+
 
 def split_audio(data, sr, window_ms, margin_ms):
     partsAudio = []

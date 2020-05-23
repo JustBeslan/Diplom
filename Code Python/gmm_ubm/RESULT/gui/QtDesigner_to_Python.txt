@@ -1,1 +1,3 @@
-./pyuic5.exe standart_window.ui -o ui_standart_window.py
+./pyuic5.exe name_QTDesingner_file.ui -o name_Python_file.py
+
+pyuic5.exe должен быть в той же папке, что и *.ui файл

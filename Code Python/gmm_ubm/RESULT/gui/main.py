@@ -1,6 +1,7 @@
 import os
 import sys
 from PyQt5.QtWidgets import *
+
 from RESULT.gui.ui_standart_window import Ui_Dialog
 from RESULT.gui.window1 import window1
 from RESULT.gui.window2 import window2
@@ -23,6 +24,7 @@ class Example(QMainWindow, Ui_Dialog):
     def nextWindow(self):
         self.windows.setCurrentIndex(self.windows.currentIndex() + 1)
         self.nextButton.setEnabled(False)
+        self.editingIntervals_pushButton.setVisible(False)
         if self.nextButton.text() == "Далее" and self.windows.currentIndex() == 1:
             self.win2 = window2(self, self.win1.main_Processing)
         if self.nextButton.text() == "Далее" and self.windows.currentIndex() == 2:
@@ -32,6 +34,9 @@ class Example(QMainWindow, Ui_Dialog):
                 pathResult = self.win1.main_Processing.audioProcessing.pathVideo + "Result/"
                 if not os.path.exists(pathResult):
                     os.makedirs(name=pathResult)
+                else:
+                    for file in os.listdir(pathResult):
+                        os.remove(pathResult + file)
                 textIntervals = self.textBox_intervalsSilence.toPlainText()
                 if textIntervals != 'No!':
                     self.saveIntervalsInFile(path_name=pathResult + "intervalsSilence.txt",

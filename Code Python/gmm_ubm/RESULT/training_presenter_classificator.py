@@ -14,6 +14,7 @@ class ClassificatorPresenter:
                                       sr=self.sr,
                                       window_ms=window_ms,
                                       margin_ms=margin_ms)
+        self.frame_length = len(self.split_data[0])
         self.intervals_split_data = [[i * window_ms, (i + 1) * window_ms] for i in range(len(self.split_data))]
         self.features_split_data = [self.ExtractFeatures(part_split_data) for part_split_data in self.split_data]
         self.indexes_intervals_presenter = [i for i, interval in enumerate(self.intervals_split_data)
@@ -26,7 +27,13 @@ class ClassificatorPresenter:
     def ExtractFeatures(self, data):
         window_s = self.window_ms / 1000
         margin_s = self.margin_ms / 1000
-        mfcc = psf.mfcc(data, self.sr, winlen=window_s, winstep=margin_s, numcep=20, appendEnergy=True)
+        mfcc = psf.mfcc(signal=data,
+                        samplerate=self.sr,
+                        winlen=window_s,
+                        winstep=margin_s,
+                        numcep=20,
+                        appendEnergy=True,
+                        nfft=self.frame_length)
         delta = psf.delta(feat=mfcc,
                           N=2)
         return np.hstack((mfcc, delta))

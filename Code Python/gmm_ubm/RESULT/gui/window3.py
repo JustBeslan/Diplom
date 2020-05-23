@@ -1,5 +1,6 @@
 from threading import Thread
 from RESULT.OtherProcessing import *
+from RESULT.gui.settings_intervals_window import settings_intervals_window
 
 
 class window3:
@@ -9,12 +10,15 @@ class window3:
         mainGUI.startVideoAnalyze_button.setVisible(False)
         mainGUI.setParameters_button.clicked.connect(lambda: self.setParameters(mainGUI))
         mainGUI.startVideoAnalyze_button.clicked.connect(lambda: self.startVideoAnalyze(mainGUI, main_Processing))
+        mainGUI.editingIntervals_pushButton.clicked.connect(lambda: self.createChildWindow(mainGUI=mainGUI,
+                                                                                           main_Processing=main_Processing))
 
     def setParameters(self, mainGUI):
         mainGUI.setParameters_groupBox.setEnabled(False)
         mainGUI.startVideoAnalyze_button.setVisible(True)
 
     def startVideoAnalyze(self, mainGUI, main_Processing):
+        mainGUI.startVideoAnalyze_button.setEnabled(False)
         mainGUI.textBox_status_3.append("Идет обработка слайдов вебинара...\n")
         mainGUI.repaint()
         t = Thread(target=main_Processing.videoAnalyse,
@@ -27,39 +31,62 @@ class window3:
         t.join()
         mainGUI.textBox_status_3.append("Обработка слайдов вебинара завершена!\n")
         mainGUI.textBox_status_3.append("Все типы интервалов были выделены!\n")
-        mainGUI.textBox_status_3.append("Нажмите 'Завершить'!\n")
         self.intervals_someone = main_Processing.videoProcessing.intervals_someone
         self.intervals_someone = correct_intervals(intervals=self.intervals_someone,
-                                                   maxSilence=main_Processing.audioProcessing.maxSilenceMs)
+                                                   maxSilence=0)
         self.intervals_someone = [interval for interval in self.intervals_someone
-                                  if abs(interval[1] - interval[0]) >= main_Processing.audioProcessing.maxSilenceMs]
+                                  if abs(interval[1] - interval[0]) >= main_Processing.audioProcessing.minLengthFrameMs]
         self.intervals_together = extractOtherIntervals(intervalsA=self.intervals_not_presenter,
                                                         intervalsB=self.intervals_someone)
+
         if len(self.intervals_someone) > 0:
-            for interval in self.intervals_someone:
-                hours_interval, minutes_interval, seconds_interval, milliseconds_interval = msToTime(interval)
-                mainGUI.textBox_intervalsSomeone.append(
-                    str(hours_interval[0]) + '.' + str(minutes_interval[0]) + '.' + str(
-                        seconds_interval[0]) + '.' + str(milliseconds_interval[0]) + '__' + str(
-                        interval[0]) + ' - ' +
-                    str(hours_interval[1]) + '.' + str(minutes_interval[1]) + '.' + str(
-                        seconds_interval[1]) + '.' + str(milliseconds_interval[1]) + '__' + str(
-                        interval[1]) + "\n")
+            insertInTextBoxIntervals(intervals=self.intervals_someone,
+                                     textbox=mainGUI.textBox_intervalsSomeone)
         else:
             mainGUI.textBox_intervalsSomeone.append("No!")
         self.intervals_together = extractOtherIntervals(intervalsA=self.intervals_not_presenter,
                                                         intervalsB=self.intervals_someone)
         if len(self.intervals_together) > 0:
-            for interval in self.intervals_together:
-                hours_interval, minutes_interval, seconds_interval, milliseconds_interval = msToTime(interval)
-                mainGUI.textBox_intervalsTogether.append(
-                    str(hours_interval[0]) + '.' + str(minutes_interval[0]) + '.' + str(
-                        seconds_interval[0]) + '.' + str(milliseconds_interval[0]) + '__' + str(
-                        interval[0]) + ' - ' +
-                    str(hours_interval[1]) + '.' + str(minutes_interval[1]) + '.' + str(
-                        seconds_interval[1]) + '.' + str(milliseconds_interval[1]) + '__' + str(
-                        interval[1]) + "\n")
+            insertInTextBoxIntervals(intervals=self.intervals_together,
+                                     textbox=mainGUI.textBox_intervalsTogether)
         else:
             mainGUI.textBox_intervalsTogether.append("No!")
+        mainGUI.textBox_status.append(
+            "Для редактирования полученных интервалов нажмите на соответствующую кнопку!\n")
+        mainGUI.textBox_status_3.append("Для завершения работы нажмите 'Завершить'!\n")
         mainGUI.nextButton.setText("Завершить")
+        mainGUI.editingIntervals_pushButton.setVisible(True)
         mainGUI.nextButton.setEnabled(True)
+
+    def createChildWindow(self, mainGUI, main_Processing):
+        form = settings_intervals_window(intervals=self.intervals_together,
+                                         another_intervals=self.intervals_someone,
+                                         data_intervals=(
+                                             main_Processing.audioProcessing.path_audio + "intervals_together/",
+                                             self.intervals_together,
+                                             main_Processing.audioProcessing.SR),
+                                         data_another_intervals=(
+                                             main_Processing.audioProcessing.path_audio + "intervals_someone/",
+                                             self.intervals_someone,
+                                             main_Processing.audioProcessing.SR),
+                                         parent=mainGUI)
+        form.label_4.setText('Интервалы ведущего и участника вместе')
+        form.alternativeIntervals_groupBox.setTitle('Интервалы участника')
+        form.exec_()
+        self.intervals_together = form.new_intervals
+        self.intervals_someone = extractOtherIntervals(intervalsA=self.intervals_not_presenter,
+                                                       intervalsB=self.intervals_together)
+        self.intervals_someone = correct_intervals(intervals=self.intervals_someone,
+                                                   maxSilence=0)
+        mainGUI.textBox_intervalsSomeone.clear()
+        if len(self.intervals_someone) > 0:
+            insertInTextBoxIntervals(intervals=self.intervals_someone,
+                                     textbox=mainGUI.textBox_intervalsSomeone)
+        else:
+            mainGUI.textBox_intervalsSomeone.append("No!")
+        mainGUI.textBox_intervalsTogether.clear()
+        if len(self.intervals_together) > 0:
+            insertInTextBoxIntervals(intervals=self.intervals_together,
+                                     textbox=mainGUI.textBox_intervalsTogether)
+        else:
+            mainGUI.textBox_intervalsTogether.append("No!")

@@ -34,18 +34,18 @@ class window3:
         self.intervals_someone = main_Processing.videoProcessing.intervals_someone
         self.intervals_someone = correct_intervals(intervals=self.intervals_someone,
                                                    maxSilence=0)
-        self.intervals_someone = [interval for interval in self.intervals_someone
-                                  if abs(interval[1] - interval[0]) >= main_Processing.audioProcessing.minLengthFrameMs]
         self.intervals_together = extractOtherIntervals(intervalsA=self.intervals_not_presenter,
                                                         intervalsB=self.intervals_someone)
-
+        for interval in self.intervals_together:
+            if abs(interval[1] - interval[0]) < main_Processing.audioProcessing.minLengthFrameMs:
+                self.intervals_someone.append(interval)
+        self.intervals_together = [interval for interval in self.intervals_together
+                                   if interval not in self.intervals_someone]
         if len(self.intervals_someone) > 0:
             insertInTextBoxIntervals(intervals=self.intervals_someone,
                                      textbox=mainGUI.textBox_intervalsSomeone)
         else:
             mainGUI.textBox_intervalsSomeone.append("No!")
-        self.intervals_together = extractOtherIntervals(intervalsA=self.intervals_not_presenter,
-                                                        intervalsB=self.intervals_someone)
         if len(self.intervals_together) > 0:
             insertInTextBoxIntervals(intervals=self.intervals_together,
                                      textbox=mainGUI.textBox_intervalsTogether)

@@ -84,10 +84,13 @@ class Audio_Processing:
     def finishedProcessing(self):
         self.intervals_silence = correct_intervals(intervals=self.intervals_silence,
                                                    maxSilence=self.maxSilenceMs)
-        self.intervals_silence = [interval for interval in self.intervals_silence
-                                  if abs(interval[1] - interval[0]) >= self.minLengthFrameMs]
         main_interval = [0, len(self.partsAudio) * self.slice_ms]
         intervals_voices = extractOtherIntervals([main_interval], self.intervals_silence)
+        for interval in intervals_voices:
+            if abs(interval[1] - interval[0]) < self.minLengthFrameMs:
+                self.intervals_silence.append(interval)
+        intervals_voices = [interval for interval in intervals_voices
+                            if interval not in self.intervals_silence]
         self.intervals_voices = []
         for interval_voices in intervals_voices:
             self.intervals_voices = self.intervals_voices + split_interval(interval=interval_voices,
@@ -97,8 +100,8 @@ class Audio_Processing:
                             if [i * self.slice_ms, (i + 1) * self.slice_ms] in self.intervals_voices]
         for interval in self.intervals_silence:
             self.data_silence.append([])
-            for j in range(interval[0]//self.slice_ms, interval[1]//self.slice_ms):
-                self.data_silence[len(self.data_silence)-1] = self.data_silence[len(self.data_silence)-1] + [list(self.partsAudio[j].flatten())]
+            for j in range(interval[0] // self.slice_ms, interval[1] // self.slice_ms):
+                self.data_silence[len(self.data_silence) - 1] += [list(self.partsAudio[j].flatten())]
         self.name_voices_audio = "voices.wav"
         librosa.output.write_wav(path=self.path_audio + self.name_voices_audio,
                                  y=np.array(self.data_voices).flatten(),

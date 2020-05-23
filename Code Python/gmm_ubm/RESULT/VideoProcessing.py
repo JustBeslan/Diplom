@@ -41,8 +41,6 @@ class Video_Processing:
         cv.destroyAllWindows()
 
     def FindConferencionRegion(self):
-        print(self.intervals)
-        print(self.interval_ms)
         i = 0
         j = 0
         b = True

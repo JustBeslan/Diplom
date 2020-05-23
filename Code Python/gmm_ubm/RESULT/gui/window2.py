@@ -20,14 +20,17 @@ class window2:
         self.corrected_data_intervals_not_presenter = []
         for interval in self.corrected_intervals_voices:
             self.corrected_data_intervals_voices.append([])
-            for j in range(interval[0]//main_Processing.audioProcessing.slice_ms, interval[1]//main_Processing.audioProcessing.slice_ms):
-                self.corrected_data_intervals_voices[len(self.corrected_data_intervals_voices)-1] = self.corrected_data_intervals_voices[len(self.corrected_data_intervals_voices)-1] + [list(main_Processing.audioProcessing.partsAudio[j].flatten())]
+            for j in range(interval[0] // main_Processing.audioProcessing.slice_ms,
+                           interval[1] // main_Processing.audioProcessing.slice_ms):
+                self.corrected_data_intervals_voices[len(self.corrected_data_intervals_voices) - 1] = \
+                    self.corrected_data_intervals_voices[len(self.corrected_data_intervals_voices) - 1] + [
+                        list(main_Processing.audioProcessing.partsAudio[j].flatten())]
         mainGUI.trainClassificator_groupBox.setVisible(False)
         mainGUI.saveMode_button.clicked.connect(lambda: self.createChildWindow(mainGUI=mainGUI,
                                                                                main_Processing=main_Processing))
         mainGUI.trainClassificator_button.clicked.connect(lambda: self.trainClassificator(mainGUI, main_Processing))
         mainGUI.editingIntervals_pushButton.clicked.connect(lambda: self.correctIntervals(mainGUI=mainGUI,
-                                                                                           main_Processing=main_Processing))
+                                                                                          main_Processing=main_Processing))
         self.max_time.setHMS(23, 59, 59, 999)
         self.min_time.setHMS(0, 0, 0, 0)
 
@@ -44,6 +47,8 @@ class window2:
 
     def correctIntervals(self, mainGUI, main_Processing):
         if mainGUI.windows.currentIndex() == 1:
+            print(len(extractOtherIntervals(intervalsA=self.corrected_intervals_voices,
+                                            intervalsB=self.intervals_not_presenter)))  # Удаляем интервалы НЕ ведущего из интервалов голосов для получения интервалов ведущего
             form = settings_intervals_window(intervals=self.intervals_not_presenter,
                                              another_intervals=self.corrected_intervals_voices,
                                              data_intervals=(
@@ -59,21 +64,22 @@ class window2:
             form.alternativeIntervals_groupBox.setTitle('Интервалы голоса')
             form.exec_()
             self.intervals_not_presenter = form.new_intervals
+            self.intervals_not_presenter = correct_intervals(intervals=self.intervals_not_presenter,
+                                                             maxSilence=0)  # После добавлений выше, склеиваем соседние интервалы НЕ ведущего
             self.intervals_presenter = extractOtherIntervals(intervalsA=self.corrected_intervals_voices,
                                                              intervalsB=self.intervals_not_presenter)  # Удаляем интервалы НЕ ведущего из интервалов голосов для получения интервалов ведущего
             self.intervals_presenter = correct_intervals(intervals=self.intervals_presenter,
                                                          maxSilence=0)  # Склеиваем интервалы ведущего, забирая мелкие интервалы НЕ ведущего
-            self.intervals_not_presenter = correct2_intervals(intervalsA=self.intervals_presenter,
-                                                              intervalsB=self.intervals_not_presenter)  # Удаляем те интервалы НЕ ведущего, которые попали целиком под интервал голоса ведущего
-            for interval in self.intervals_presenter:
+            # self.intervals_not_presenter = correct2_intervals(intervalsA=self.intervals_presenter,
+            #                                                   intervalsB=self.intervals_not_presenter)  # Удаляем те интервалы НЕ ведущего, которые попали целиком под интервал голоса ведущего
+            for interval in self.intervals_not_presenter:
                 if abs(interval[1] - interval[0]) < main_Processing.audioProcessing.minLengthFrameMs:
-                    self.intervals_not_presenter.append(
+                    self.intervals_presenter.append(
                         interval)  # Добавляем к интервалам НЕ ведущего те интервалы ведущего, которые по длине маленькие
-            self.intervals_not_presenter = correct_intervals(intervals=self.intervals_not_presenter,
-                                                             maxSilence=0)  # После добавлений выше, склеиваем соседние интервалы НЕ ведущего
-            self.intervals_presenter = [interval for interval in self.intervals_presenter
-                                        if
-                                        interval not in self.intervals_not_presenter]  # Удаляем из интервалов ведущего те интервалы, которые попали(по длине) к интервалам НЕ ведущего
+            self.intervals_not_presenter = [interval for interval in self.intervals_not_presenter
+                                            if
+                                            interval not in self.intervals_presenter]  # Удаляем из интервалов ведущего те интервалы, которые попали(по длине) к интервалам НЕ ведущего
+            print(len(self.intervals_presenter))
             mainGUI.textBox_intervalsPresenter.clear()
             insertInTextBoxIntervals(intervals=self.intervals_presenter,
                                      textbox=mainGUI.textBox_intervalsPresenter)
@@ -95,8 +101,10 @@ class window2:
                                         main_Processing.audioProcessing.minLengthFrameMs]
         for interval in self.intervals_not_presenter:
             self.corrected_data_intervals_not_presenter.append([])
-            for j in range(interval[0]//main_Processing.audioProcessing.slice_ms, interval[1]//main_Processing.audioProcessing.slice_ms):
-                self.corrected_data_intervals_not_presenter[len(self.corrected_data_intervals_not_presenter)-1] += [list(main_Processing.audioProcessing.partsAudio[j].flatten())]
+            for j in range(interval[0] // main_Processing.audioProcessing.slice_ms,
+                           interval[1] // main_Processing.audioProcessing.slice_ms):
+                self.corrected_data_intervals_not_presenter[len(self.corrected_data_intervals_not_presenter) - 1] += [
+                    list(main_Processing.audioProcessing.partsAudio[j].flatten())]
 
     def trainClassificator(self, mainGUI, main_Processing):
         mainGUI.trainClassificator_groupBox.setEnabled(False)
@@ -112,10 +120,9 @@ class window2:
         mainGUI.textBox_status_2.append("Идет классификация интервалов...\n")
         mainGUI.repaint()
         t = Thread(target=self.classificationIntervals,
-                   args=(main_Processing, ))
+                   args=(main_Processing,))
         t.start()
         t.join()
         mainGUI.textBox_status_2.append("Классификация интервалов завершена!\n")
         self.correctIntervals(mainGUI=mainGUI,
                               main_Processing=main_Processing)
-
